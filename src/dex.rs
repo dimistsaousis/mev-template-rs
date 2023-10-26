@@ -24,4 +24,16 @@ impl Dex {
             router,
         }
     }
+
+    pub async fn get_pairs(&self) {
+        println!("Calling allPairsLength from {}", self.factory_address);
+        match self.factory.all_pairs_length().call().await {
+            Ok(result) => {
+                println!("   ~ [PASS] Total pairs: {:?}", result)
+            }
+            Err(e) => {
+                println!("   ~ [FAIL] Total pairs: {:?}", e)
+            }
+        }
+    }
 }
