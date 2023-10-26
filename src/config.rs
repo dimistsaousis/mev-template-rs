@@ -1,5 +1,5 @@
 use ethers::{
-    prelude::{k256::ecdsa::SigningKey, Http, Provider, SignerMiddleware},
+    prelude::{k256::ecdsa::SigningKey, Http, Provider, SignerMiddleware, Ws},
     providers::Middleware,
     signers::{LocalWallet, Signer, Wallet},
 };
@@ -8,21 +8,19 @@ use std::sync::Arc;
 #[derive(Debug)]
 pub struct Config {
     pub http: Arc<SignerMiddleware<Provider<Http>, Wallet<SigningKey>>>,
-    pub wss: String,
+    pub wss: Provider<Ws>,
 }
 
 impl Config {
     pub async fn new() -> Self {
         let netword_rpc = std::env::var("NETWORK_RPC").expect("missing NETWORK_RPC");
-        let netword_wss = std::env::var("NETWORK_WSS").expect("missing NETWORK_WSS");
-        let http = Provider::try_from(netword_rpc).unwrap();
+        let http: Provider<Http> = Provider::<Http>::try_from(netword_rpc).unwrap();
         let http = setup_signer(http).await;
         let http = Arc::new(http);
 
-        Config {
-            http,
-            wss: netword_wss,
-        }
+        let netword_wss = std::env::var("NETWORK_WSS").expect("missing NETWORK_WSS");
+        let wss: Provider<Ws> = Provider::<Ws>::connect(netword_wss).await.unwrap();
+        Config { http, wss }
     }
 }
 
