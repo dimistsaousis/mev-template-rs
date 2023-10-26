@@ -18,9 +18,13 @@ pub struct Dex {
 }
 
 impl Dex {
-    pub fn new(factory_address: Address, router_address: Address, config: Config) -> Dex {
-        let factory = UniV2Factory::new(factory_address, Arc::clone(&config.http));
-        let router = UniV2Router::new(router_address, Arc::clone(&config.http));
+    pub fn new(
+        factory_address: Address,
+        router_address: Address,
+        http: Arc<SignerMiddleware<Provider<Http>, Wallet<SigningKey>>>,
+    ) -> Dex {
+        let factory = UniV2Factory::new(factory_address, Arc::clone(&http));
+        let router = UniV2Router::new(router_address, Arc::clone(&http));
         Dex {
             factory_address,
             router_address,
