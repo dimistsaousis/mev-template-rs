@@ -1,8 +1,11 @@
 use crate::{
-    address_book::{UniV2Factory, UniV2Router},
+    address_book::{UniV2Factory, UniV2Router, UniV2RouterCalls},
     config::Config,
 };
-use ethers::prelude::{k256::ecdsa::SigningKey, Address, Http, Provider, SignerMiddleware, Wallet};
+use ethers::prelude::{
+    abi::AbiDecode, k256::ecdsa::SigningKey, Address, Bytes, Http, Provider, SignerMiddleware,
+    Wallet,
+};
 use std::sync::Arc;
 
 #[allow(dead_code)]
@@ -35,5 +38,11 @@ impl Dex {
                 println!("Total pairs: {:?}", e)
             }
         }
+    }
+
+    pub async fn decode_router_tx_data(&self, tx_data: String) {
+        let calldata: Bytes = tx_data.parse().unwrap();
+        let decoded = UniV2RouterCalls::decode(&calldata).unwrap();
+        println!("Decoded dex tx: {:?}", decoded);
     }
 }
