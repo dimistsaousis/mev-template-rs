@@ -3,9 +3,10 @@ use crate::{
     config::Config,
 };
 use ethers::prelude::{
-    abi::AbiDecode, k256::ecdsa::SigningKey, Address, Bytes, Http, Provider, SignerMiddleware,
-    Wallet,
+    abi::AbiDecode, k256::ecdsa::SigningKey, Address, Bytes, Filter, Http, Log, Middleware,
+    Provider, SignerMiddleware, StreamExt, SubscriptionStream, Wallet, Ws,
 };
+
 use std::sync::Arc;
 
 #[allow(dead_code)]
@@ -44,5 +45,27 @@ impl Dex {
         let calldata: Bytes = tx_data.parse().unwrap();
         let decoded = UniV2RouterCalls::decode(&calldata).unwrap();
         println!("Decoded dex tx: {:?}", decoded);
+    }
+
+    pub async fn stream_pairs_created(&self, config: Config) {
+        let filter = Filter::new()
+            .address(self.factory_address)
+            .event("PairCreated");
+
+        let mut stream: SubscriptionStream<Ws, Log> =
+            config.wss.subscribe_logs(&filter).await.unwrap();
+
+        println!(
+            "Listening for PairCreated events, from {}",
+            self.factory_address
+        );
+        while let Some(log) = stream.next().await {
+            println!(
+                "   ~ [FOUND] Hash {:?}\nLog: {:?}",
+                log.transaction_hash,
+                log.data,
+                // PsNewSale::decode(log.data)
+            );
+        }
     }
 }
