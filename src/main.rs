@@ -1,8 +1,9 @@
-use mev_template::alert;
+use mev_template::config::Config;
 
 #[tokio::main]
 async fn main() {
     dotenv::dotenv().ok();
 
-    alert::alert("Hello").await;
+    let config = Config::new().await;
+    println!("{:?}", config);
 }
