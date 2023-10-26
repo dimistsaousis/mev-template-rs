@@ -1,6 +1,8 @@
+use mev_template::alert;
+
 #[tokio::main]
 async fn main() {
     dotenv::dotenv().ok();
 
-    println!("hellow");
+    alert::alert("Hello").await;
 }
