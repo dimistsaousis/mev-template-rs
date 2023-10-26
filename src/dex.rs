@@ -29,10 +29,10 @@ impl Dex {
         println!("Calling allPairsLength from {}", self.factory_address);
         match self.factory.all_pairs_length().call().await {
             Ok(result) => {
-                println!("   ~ [PASS] Total pairs: {:?}", result)
+                println!("Total pairs: {:?}", result)
             }
             Err(e) => {
-                println!("   ~ [FAIL] Total pairs: {:?}", e)
+                println!("Total pairs: {:?}", e)
             }
         }
     }
